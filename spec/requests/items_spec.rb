@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 RSpec.describe "Items", type: :request do
   before do
     u1 = User.create(username: "Dwayne", city: "Los Angeles")
@@ -62,7 +60,7 @@ RSpec.describe "Items", type: :request do
   end
 
   describe "POST /users/:user_id/items" do
-    let!(:item_params) { { name: "Garden gnomes", description: "No refunds", price: 23 } }
+    let!(:item_params) { { item: { name: "Garden gnomes", description: "No refunds", price: 23 } } }
 
     it 'creates a new item belonging to a user' do
       expect { post "/users/#{user.id}/items", params: item_params }.to change(user.items, :count).by(1)
@@ -70,7 +68,7 @@ RSpec.describe "Items", type: :request do
 
     it 'returns the newly created item' do
       post "/users/#{user.id}/items", params: item_params
-      
+
       expect(response.body).to include_json({
         id: a_kind_of(Integer),
         name: "Garden gnomes",
@@ -87,7 +85,7 @@ RSpec.describe "Items", type: :request do
     end
 
     it 'returns a 404 response if the user is not found' do
-      get "/users/bad_id/items"
+      post "/users/bad_id/items", params: item_params
 
       expect(response).to have_http_status(:not_found)
     end
@@ -98,10 +96,10 @@ RSpec.describe "Items", type: :request do
       get '/items'
 
       expect(response.body).to include_json([
-        { 
-          id: a_kind_of(Integer), 
-          name: "Non-stick pan", 
-          description: "Sticks a bit", 
+        {
+          id: a_kind_of(Integer),
+          name: "Non-stick pan",
+          description: "Sticks a bit",
           price: 10,
           user: {
             id: a_kind_of(Integer),
